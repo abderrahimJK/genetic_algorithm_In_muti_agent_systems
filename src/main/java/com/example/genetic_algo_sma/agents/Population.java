@@ -9,6 +9,7 @@ import java.util.Random;
 public class Population extends Agent {
 
     private Individual[] population;
+    private int maxIter;
     private List<Individual> matingPool;
     private int popMax;
     private String target;
@@ -19,10 +20,11 @@ public class Population extends Agent {
     private boolean finished = false;
     private double perfectScore = 1.0;
 
-    public Population(String target, int popMax, double mutationRate) {
+    public Population(String target, int popMax, double mutationRate, int maxIter) {
         this.target = target;
         this.popMax = popMax;
         this.mutationRate = mutationRate;
+        this.maxIter = maxIter;
         population = new Individual[popMax];
         matingPool = new ArrayList<>();
         random = new Random();
@@ -111,6 +113,14 @@ public class Population extends Agent {
 
     public double getMutationRate() {
         return mutationRate;
+    }
+
+    public int getMaxIter() {
+        return maxIter;
+    }
+
+    public void setMaxIter(int maxIter) {
+        this.maxIter = maxIter;
     }
 
     public boolean isFinished() {
