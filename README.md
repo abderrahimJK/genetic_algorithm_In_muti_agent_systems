@@ -132,4 +132,5 @@ Compute the current "most fit" member of the population
                     Thread.sleep(100);
                 }
 
+![Genetic Algorithm 2023-05-03 20-40-44](https://user-images.githubusercontent.com/63566276/236045691-b850cf89-bd20-4405-8437-4e8b393eb437.gif)
 
