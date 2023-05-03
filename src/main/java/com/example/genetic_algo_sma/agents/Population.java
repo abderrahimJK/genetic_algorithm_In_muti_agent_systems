@@ -67,7 +67,7 @@ public class Population extends Agent {
         }
     }
 
-    public void generate() {
+    public void evolve() {
         for (int i = 0; i < population.length; i++) {
             int a = random.nextInt(matingPool.size());
             int b = random.nextInt(matingPool.size());
@@ -80,7 +80,13 @@ public class Population extends Agent {
         generations++;
     }
 
-
+    public double getAverageFitness() {
+        double total = 0;
+        for (int i = 0; i < this.population.length; i++) {
+            total += this.population[i].getFitness();
+        }
+        return total / this.population.length;
+    }
 
     public double map(double value, double start1, double stop1, double start2, double stop2) {
         return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
