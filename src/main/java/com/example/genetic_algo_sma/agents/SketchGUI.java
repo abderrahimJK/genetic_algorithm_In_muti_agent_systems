@@ -28,11 +28,12 @@ public class SketchGUI implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             startContainer();
-            String target = "hello";
+            String target = "bonjour";
             double mutationRate = 0.01;
             int popMax = 200;
+            int maxIter = 10;
 
-            population = new Population(target, popMax, mutationRate);
+            population = new Population(target, popMax, mutationRate ,maxIter);
             startBtn.setOnAction(actionEvent -> evolve());
         } catch (StaleProxyException e) {
             throw new RuntimeException(e);
@@ -49,16 +50,43 @@ public class SketchGUI implements Initializable {
     }
 
     private void evolve(){
-        while (!population.isFinished()){
 
-            population.naturalSelection();
-            population.generate();
-            population.calcFitness();
-            population.evaluate();
-            GuiEvent guiEvent = new GuiEvent(this, 1);
-            guiEvent.addParameter(population.getBest().getGenes());
-            sketchAgent.onGuiEvent(guiEvent);
+        if (brutForceTask != null && brutForceTask.isRunning()) {
+            return; // already running
         }
+        brutForceTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                int iteration = 0;
+                while (iteration < population.getMaxIter() || !population.isFinished()){
+                    population.naturalSelection();
+                    population.generate();
+                    population.calcFitness();
+                    population.evaluate();
+                    iteration++;
+                    GuiEvent guiEvent = new GuiEvent(this, 1);
+                    guiEvent.addParameter(population.getBest().getGenes());
+                    sketchAgent.onGuiEvent(guiEvent);
+                    updateMessage(Arrays.toString(population.getBest().getGenes()));
+                    Thread.sleep(100);
+                }
+                return null;
+            }
+
+        };
+
+        bestPhrase.textProperty().bind(brutForceTask.messageProperty());
+        new Thread(brutForceTask).start();
+//        while (!population.isFinished()){
+//
+//            population.naturalSelection();
+//            population.generate();
+//            population.calcFitness();
+//            population.evaluate();
+//            GuiEvent guiEvent = new GuiEvent(this, 1);
+//            guiEvent.addParameter(population.getBest().getGenes());
+//            sketchAgent.onGuiEvent(guiEvent);
+//        }
     }
 
     public void setSketchAgent(Sketch sketchAgent) {
