@@ -14,7 +14,7 @@ public class Individual extends Agent {
         genes = new char[numGenes];
         Random r = new Random();
         for (int i = 0; i < numGenes; i++) {
-            genes[i] = (char) (r.nextInt(26) + 'a');
+            genes[i] = newChar();
         }
     }
 
@@ -49,9 +49,25 @@ public class Individual extends Agent {
         Random r = new Random();
         for (int i = 0; i < genes.length; i++) {
             if (Math.random() < mutationRate) {
-                genes[i] = (char) (r.nextInt(26) + 'a');
+                genes[i] = newChar();
             }
         }
+    }
+
+    private char newChar() {
+        random = new Random();
+        int c = (int) Math.floor(Math.random() * (122 - 63 + 1)) + 63;
+        if (c == 63) {
+            c = 32;
+        }
+        if (c == 64) {
+            c = 46;
+        }
+        return (char) c;
+    }
+
+    public String getPhrase(){
+        return new String(genes);
     }
 
     public char[] getGenes() {
