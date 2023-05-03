@@ -6,6 +6,7 @@ import jade.gui.GuiEvent;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -17,6 +18,10 @@ import java.util.ResourceBundle;
 
 public class SketchGUI implements Initializable {
 
+    public Label geneNumber;
+    public Label avgFitness;
+    public Label totalPop;
+    public Label mutationRate;
     private Population population;
     public Label bestPhrase;
     public Button startBtn;
@@ -28,7 +33,7 @@ public class SketchGUI implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
             startContainer();
-            String target = "bonjour";
+            String target = "To be or not to be";
             double mutationRate = 0.01;
             int popMax = 200;
             int maxIter = 10;
@@ -60,15 +65,25 @@ public class SketchGUI implements Initializable {
                 int iteration = 0;
                 while (iteration < population.getMaxIter() || !population.isFinished()){
                     population.naturalSelection();
-                    population.generate();
+                    population.evolve();
                     population.calcFitness();
                     population.evaluate();
                     iteration++;
                     GuiEvent guiEvent = new GuiEvent(this, 1);
                     guiEvent.addParameter(population.getBest().getGenes());
                     sketchAgent.onGuiEvent(guiEvent);
-                    updateMessage(Arrays.toString(population.getBest().getGenes()));
+                    updateMessage(population.getBest().getPhrase());
+                    int finalIteration = iteration;
+                    Platform.runLater( ()->{
+
+                        geneNumber.setText(String.valueOf(population.getGenerations()));
+                        totalPop.setText(String.valueOf(population.getPopMax()));
+                        mutationRate.setText(String.valueOf(population.getMutationRate()));
+                        avgFitness.setText(String.valueOf(population.getAverageFitness()));
+
+                    });
                     Thread.sleep(100);
+                    
                 }
                 return null;
             }
@@ -77,16 +92,6 @@ public class SketchGUI implements Initializable {
 
         bestPhrase.textProperty().bind(brutForceTask.messageProperty());
         new Thread(brutForceTask).start();
-//        while (!population.isFinished()){
-//
-//            population.naturalSelection();
-//            population.generate();
-//            population.calcFitness();
-//            population.evaluate();
-//            GuiEvent guiEvent = new GuiEvent(this, 1);
-//            guiEvent.addParameter(population.getBest().getGenes());
-//            sketchAgent.onGuiEvent(guiEvent);
-//        }
     }
 
     public void setSketchAgent(Sketch sketchAgent) {
